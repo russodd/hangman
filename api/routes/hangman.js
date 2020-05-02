@@ -1,11 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
+// Load hangman game state data from a given ID
 router.get('/load', function(req, res, next) {
   res.send({
     "id": 0, // an integer representing the current game state, which can be added to the client URL in order to call up a particular game state at any time.

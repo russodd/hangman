@@ -31,3 +31,5 @@ Here's my plan for writing the program:
 6. Implement an API endpoint called `guess`, which will take a string argument representing the current game state ID and a second string argument representing the player's guess (either a letter or an entire word).  It will also return a new game state, like the `load` endpoint does, reflecting the result of the player's move, with a `"prevMove"` value matching the game state ID that was passed as an argument to the `guess` endpoint.  This new game state will be added to the game state dictionary.
 
 7. Wire up the `guess` endpoint to the "Guess" button on the client side.  Configure the UI to display "Game Over!" or "You got all the words!" messages when appropriate.
+
+8. Deploy the API and client using AWS.
