@@ -14,17 +14,19 @@ Here's my plan for writing the program:
 {
     "id": 0, // an integer representing the current game state, which can be added to the client URL in order to call up a particular game state at any time.
     "letters": ["_", "_", "_", "_", "_", "_"],  // The correctly-guessed letters of the word, with blanks representing letters that havent been found yet
+    "correctGuesses": [],   // The letters the user has guessed correctly
+    "incorrectGuesses": [], // The letters the user has guessed incorrectly
     "guessesLeft": 8,   // The number of incorrect guesses the player has left
     "gameComplete": false,  // A flag for whether the current game is in a completed state
     "gameLost": false, // A flag saying whether the player has lost the game
-    "wordsRemaining": true,  // A flag showing whether there are any more words left to guess at after the current one
+    "hasWordsRemaining": true,  // A flag showing whether there are any more words left to guess at after the current one
     "prevMove": null    // The game state ID of the player's previous move, or null when the player is starting a brand-new game
 }
 ```
 
 3. Wire up the client to display data from the API's `load` endpoint (the dummy data, for now) instead of static data.
 
-4. Set up the API to load actual words, chosen at random from a list, into a data structure similar to the one above, except with an extra field called `wordsRemaining`, that keeps track of which words the player hasn't tried to guess yet.  The `letters` array will represent the actual number of blanks needed for the word, and the `id` will contain an MD5 hash string generated using all of the other values in the game state data structure.  A dictionary with game state IDs as keys and game state data structures as values will keep track of new game states as they're created.
+4. Set up the API to load actual words, chosen at random from a list, into a data structure similar to the one above, except with an extra field called `remainingWords`, that keeps track of which words the player hasn't tried to guess yet (and which we don't want the user to be able to see on the client side, since it would give them the ability to eventually figure out which order the words will appear in).  The `letters` array will represent the actual number of blanks needed for the word, and the `id` will contain an MD5 hash string generated using all of the other values in the game state data structure.  A dictionary with game state IDs as keys and game state data structures as values will keep track of new game states as they're created.
 
 5. Set up the client to handle game state IDs in its URL, calling the `load` endpoint with their values. Also, display a bookmarkable/sharable link for the current game state, and wire up the "Undo" button to call the `load` endpoint with the the value of the current state's `prevMove`.
 
