@@ -45,17 +45,46 @@ function Hangman() {
         }
     }
 
+    function renderIncorrectGuesses() {
+        if (gameState.incorrectGuesses && gameState.incorrectGuesses.length > 0) {
+            return <div>Incorrect guesses: 
+                {gameState.incorrectGuesses.map((guess, idx) => {
+                return idx === gameState.incorrectGuesses.length - 1 ? guess : guess + ', ';
+            })}
+            </div>
+        }
+    }
+
+    function renderUndo() {
+        if (gameState.prevMove) {
+            return <button type="button" className="undo-button" onClick={loadState(gameState.prevMove)}>Undo</button>;
+        } else {
+            return '';
+        }
+    }
+
+    function renderNewGame() {
+        if (gameState.gameComplete && gameState.hasWordsRemaining) {
+            return <button type="button" className="new-game-button">New Game</button>;
+        } else {
+            return '';
+        }
+    }
+
     return (
         <div className="hangman-app">
             <div className="title">HANGMAN</div>
             <div className="letters">{renderLetters()}</div>
+            <div className="incorrect">{renderIncorrectGuesses()}</div>
             <div className="guesses">You have {gameState.guessesLeft || 0} guesses remaining.</div>
             <form>
                 <input type="text" className="guess-textbox" />
                 <input type="submit" value="Guess" className="guess-button" />
             </form>
-            <button type="button" className="undo-button">Undo</button>
-            <button type="button" className="new-game-button">New Game</button>
+            <div>
+                <span>{renderUndo()}</span>
+                <span>{renderNewGame()}</span>
+            </div>
             <div>Share your game: {HANGMAN_FRONTEND + '?state=' + currentStateId}</div>
         </div>
     );
