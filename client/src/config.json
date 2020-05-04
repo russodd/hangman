@@ -1,0 +1,4 @@
+{
+    "hangman_frontend": "http://localhost:3001/",
+    "hangman_backend": "http://localhost:3000/"
+}

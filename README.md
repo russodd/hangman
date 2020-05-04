@@ -2,7 +2,7 @@
 
 ## Design
 
-This project consists of two parts: a React client (located in the `client` folder) and a Node.js backend API (located in the `api` folder).  If you wish to clone it and try it out for yourself, you'll need to run `npm install` in both the `client` and the `api` directories to install the necessary node modules before either app can run (the app was built with node v14.0.0).  Once the node modules are set up, you can run `npm start` in the `client` directory to start the client (which runs on port 3000), and in the `api` directory to start the API (which runs on port 9000).
+This project consists of two parts: a React client (located in the `client` folder) and a Node.js backend API (located in the `api` folder).  If you wish to clone it and try it out for yourself, you'll need to run `npm install` in both the `client` and the `api` directories to install the necessary node modules before either app can run (the app was built with node v14.0.0).  Once the node modules are set up, you can run `npm start` in the `api` directory to start the API (which runs on port 3000), and in the `client` directory to start the client (which also runs on port 3000 by default, but which can be switched to port 3001 by saying yes when prompted).
 
 Here's my plan for writing the program:
 
@@ -33,4 +33,22 @@ Here's my plan for writing the program:
 
 7. Wire up the `guess` endpoint to the "Guess" button on the client side.  Configure the UI to display "Game Over!" or "You got all the words!" messages when appropriate.
 
-8. Deploy the API and client using AWS.
+## Validation
+
+1. **Rules:** The game behaves as described in the rules, with the words being chosen from a randomized list, one by one, eight incorrect guesses per word, game over when a player runs out of guesses or guesses the entire word wrong, and the player being told that they have won when they either guess all the correct letters without running out of guesses or they guess the entire word at once.
+
+2. **New Game:** A "New Game" button appears when the user is able to start a new game (after they have just won a game).
+
+3. **Bookmarkable Turns** This one ended up being sort of a fudge, since I ran out of time.  The user can bookmark the shareable URL at the bottom of the page if they would like to return to their current turn later.
+
+4. **Sharing:** The same URL mentioned above for bookmarking can also be shared and used by anyone else.
+
+5. **Undo:** An "Undo" button appears whenever the player is able to undo their actions (on any turn besides the first one).
+
+6. **Standards:** I was able to test the app successfully on current versions of Chrome, Safari, and Firefox.
+
+7. **Security:** The client has no information about what the words being guessed are, besides what it displays to the user.  All game states are represented by MD5 hashes generated on the server side.  The server stores all data about the words in memory, and decides the outcome of each turn.
+
+8. **Proxy-Friendly:** I see no reason why the app shouldn't work behind a caching HTTP reverse-proxy.
+
+9. **No Other Software/Storage:** All information generated on the server side is stored in memory.
