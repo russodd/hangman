@@ -6,15 +6,19 @@ const config = require('./config.json');
 const HANGMAN_FRONTEND = config.hangman_frontend;
 const HANGMAN_BACKEND = config.hangman_backend;
 const HANGMAN_LOAD_ENDPOINT = 'hangman/load';
+const HANGMAN_GUESS_ENDPOINT = 'hangman/guess';
 
 function Hangman() {
     const [gameState, setGameState] = useState({});
+    const [guess, setGuess] = useState('');
     let params = new URLSearchParams(useLocation().search);
     const currentStateId = params.get('state');
  
     useEffect(() => {
-        loadState(currentStateId);
-    }, [currentStateId]);
+        if (!gameState.id) {
+            loadState(currentStateId);
+        }
+    }, [gameState.id, currentStateId]);
 
     function loadState(stateId = null) {
         let loadUrl = HANGMAN_BACKEND + HANGMAN_LOAD_ENDPOINT;
@@ -55,17 +59,76 @@ function Hangman() {
         }
     }
 
-    function renderUndo() {
-        if (gameState.prevMove) {
-            return <button type="button" className="undo-button" onClick={loadState(gameState.prevMove)}>Undo</button>;
+    function renderGuessesLeft() {
+        if (gameState.guessesLeft > 0 && gameState.gameComplete) {
+            return <div>You win!</div>;
+        } else if (gameState.guessesLeft > 0) {
+            return <div className="guesses">You have {gameState.guessesLeft} guesses remaining.</div>;
+        } else {
+            return <div>Game over!</div>;
+        }
+    }
+
+    function handleGuessUpdate(event) {
+        setGuess(event.target.value);
+    }
+
+    function callGuessEndpoint(useGuess = true) {
+        let guessUrl = HANGMAN_BACKEND + HANGMAN_GUESS_ENDPOINT + '?state=' + gameState.id;
+
+            if (useGuess) {
+                guessUrl += '&guess=' + guess;
+            }
+
+            fetch(guessUrl)
+                .then(res => res.json())
+                .then(res => setGameState(res))
+                .catch(err => alert(err.message));
+    }
+
+    function handleSubmitGuess(event) {
+        if (!guess) {
+            alert('Please guess a letter, or the whole word');
+        } else {
+            callGuessEndpoint();
+            setGuess('');
+        }
+        
+        event.preventDefault();
+    }
+
+    function renderGuess() {
+    if (!gameState.gameComplete) {
+            return (
+                <form onSubmit={handleSubmitGuess}>
+                    <input type="text" className="guess-textbox" value={guess} onChange={handleGuessUpdate} />
+                    <input type="submit" value="Guess" className="guess-button" />
+                </form>
+            );
         } else {
             return '';
         }
     }
 
-    function renderNewGame() {
-        if (gameState.gameComplete && gameState.hasWordsRemaining) {
-            return <button type="button" className="new-game-button">New Game</button>;
+    function handleUndo() {
+        loadState(gameState.prevMove);
+    }
+
+    function renderUndo() {
+        if (gameState.prevMove) {
+            return <button type="button" className="undo-button" onClick={handleUndo}>Undo</button>;
+        } else {
+            return '';
+        }
+    }
+
+    function handleNewGame() {
+        callGuessEndpoint(false);
+    }
+
+   function renderNewGame() {
+        if (gameState.guessesLeft > 0 && gameState.gameComplete && gameState.hasWordsRemaining) {
+            return <button type="button" className="new-game-button" onClick={handleNewGame}>New Game</button>;
         } else {
             return '';
         }
@@ -76,16 +139,13 @@ function Hangman() {
             <div className="title">HANGMAN</div>
             <div className="letters">{renderLetters()}</div>
             <div className="incorrect">{renderIncorrectGuesses()}</div>
-            <div className="guesses">You have {gameState.guessesLeft || 0} guesses remaining.</div>
-            <form>
-                <input type="text" className="guess-textbox" />
-                <input type="submit" value="Guess" className="guess-button" />
-            </form>
+            <div className="guesses">{renderGuessesLeft()}</div>
+            <div>{renderGuess()}</div>
             <div>
                 <span>{renderUndo()}</span>
                 <span>{renderNewGame()}</span>
             </div>
-            <div>Share your game: {HANGMAN_FRONTEND + '?state=' + currentStateId}</div>
+            <div>Bookmark or share your game: {HANGMAN_FRONTEND + '?state=' + gameState.id}</div>
         </div>
     );
 }

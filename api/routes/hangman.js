@@ -67,7 +67,6 @@ function startNewGame(prevState) {
 
     // Create an MD5 hash to be used as a game state ID
     newGameState.id = crypto.createHash('md5').update(JSON.stringify(newGameState)).digest('hex');
-    console.log('New game ID: '+newGameState.id);
 
     return newGameState;
 }
@@ -130,13 +129,14 @@ router.get('/guess', function(req, res, next) {
         if (!gameState.hasWordsRemaining) {
             throw new Error('There are no words remaining');
         }
-        newGameState = startNewGame(gameState.id);
+        newGameState = startNewGame(gameState);
     } else {
         if (!guess) {
             throw new Error('No guess argument found');
         }
         // Make a deep copy of the current game state
         newGameState = JSON.parse(JSON.stringify(gameState));
+        newGameState.prevMove = gameState.id;
         // Strip out its ID
         newGameState.id = undefined;
         if (guess.length === 1) {
@@ -164,7 +164,7 @@ router.get('/guess', function(req, res, next) {
             let correct = true;
             // Check that every letter in the guess is where it should be
             guess.split('').forEach((letter, idx) => {
-                if (newGameState.letterLookup[letter].indexOf(idx) < 0) {
+                if (newGameState.letterLookup[letter] && newGameState.letterLookup[letter].indexOf(idx) < 0) {
                     correct = false;
                 }
             });
